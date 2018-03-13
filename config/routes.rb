@@ -4,6 +4,8 @@ Rails.application.routes.draw do
     namespace :v1 do
       get "/makes", to: 'makes#index'
       get "/makes/:id", to: 'makes#show'
+      post "/makes", to: 'makes#create'
+      put "/makes/:id", to: 'makes#update'
     end
   end
 end

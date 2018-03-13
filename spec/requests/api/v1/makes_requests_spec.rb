@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe "Makes API" do
-  it "sends a list of makes with JSON 200 response" do
+  it "GET a list of makes with JSON 200 response" do
     # When I send a GET request to `/api/v1/makes`
     # I receive a successfull response containing all makes
     # And each item has an id, name, associated models, associated vehicles
@@ -43,7 +43,7 @@ describe "Makes API" do
     expect(raw_makes.last[:updated_at]).to_not be_nil
   end
 
-  it "gets a specfic item with a 200 response" do
+  it "GET a specfic make with a 200 response" do
     make1 = create(:make) # Has no models or vehicles associated
     make2 = create(:make) # Has 1 model and 1 vehicle associated, used to show accurately
     model = create(:model, make: make2)
@@ -85,5 +85,56 @@ describe "Makes API" do
     expect(new_raw_make[:vehicles].first[:vehicle_id]).to eq(vehicle.id)
     expect(new_raw_make[:vehicles].first[:model_name]).to eq(vehicle.model.name)
     expect(new_raw_make[:total_active_vehicles]).to eq(1)
+  end
+
+  it "POST a new make with a 201 response" do
+    expect(Make.count).to eq(0)
+
+    post "/api/v1/makes?name=SmartCar"
+
+    expect(response).to be_success
+    expect(response.status).to eq(201)
+
+    expect(Make.count).to eq(1) #Line 91 and this show something was successfully entered into the database
+
+    new_make = JSON.parse(response.body, symbolize_names: true)
+
+    expect(new_make[:name]).to eq("SmartCar")
+    expect(new_make[:name]).to eq(Make.last.name)
+    expect(new_make[:id]).to eq(Make.last.id)
+    expect(new_make[:models]).to eq([]) # Lines 105:107 being empty shows it redirects to the
+    expect(new_make[:vehicles]).to eq([]) # show page for the newly created Make
+    expect(new_make[:total_active_vehicles]).to eq(0) # and uses the serializer
+
+    post "/api/v1/makes?name=Audi"
+
+    expect(Make.count).to eq(2) # Confirms what Line 98 shows
+  end
+
+  it "PUT an existing make" do
+    make1 = create(:make) # Has no models or vehicles associated
+    old_updated_at = make1.updated_at
+
+    expect(make1.name).to_not eq("SmartCar")
+
+    expect(Make.count).to eq(1)
+    put "/api/v1/makes/#{make1.id}?name=SmartCar"
+
+    expect(response).to be_success
+
+    expect(Make.count).to eq(1) # Shows that nothing was added to the database
+
+    make = JSON.parse(response.body, symbolize_names: true)
+
+    expect(make[:name]).to eq("SmartCar")
+    expect(make[:id]).to eq(make1.id)
+    expect(make[:updated_at]).to_not eq(old_updated_at)
+
+    put "/api/v1/makes/#{make1.id}?name=Audi"
+
+    make = JSON.parse(response.body, symbolize_names: true)
+
+    expect(make[:name]).to eq("Audi")
+    expect(make[:id]).to eq(make1.id)
   end
 end
