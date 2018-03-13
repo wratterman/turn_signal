@@ -22,13 +22,13 @@ class Api::V1::MakesController < ApplicationController
   end
 
   def destroy
+    destroy_dependancies(@make)
     @make.update_attributes(deleted_at: Time.now)
     render json: @make, serializer: MakesSerializer
 
-    # If deleting from the database un-comments from lines 31:32 & 46:53
+    # If deleting from the database un-comments from lines 31:32 & 49 & 53
     # and comment out lines 25:26
 
-    # destroy_dependancies(@make)
     # @make.destroy
     # head :no_content
   end
@@ -43,12 +43,14 @@ class Api::V1::MakesController < ApplicationController
     params.permit(:name)
   end
 
-  # def destroy_dependancies(make)
-  #   make.vehicles.each do |vehicle|
-  #     vehicle.destroy
-  #   end
-  #   make.models.each do |model|
-  #     model.destroy
-  #   end
-  # end
+  def destroy_dependancies(make)
+    make.vehicles.each do |vehicle|
+      vehicle.update_attributes(deleted_at: Time.now)
+      #vehicle.destroy
+    end
+    make.models.each do |model|
+      model.update_attributes(deleted_at: Time.now)
+      #model.destroy
+    end
+  end
 end

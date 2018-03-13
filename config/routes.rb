@@ -7,6 +7,8 @@ Rails.application.routes.draw do
       post "/makes", to: 'makes#create'
       put "/makes/:id", to: 'makes#update'
       delete "/makes/:id", to: 'makes#destroy'
+
+      get "/models", to: 'models#index'
     end
   end
 end
