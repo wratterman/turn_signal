@@ -1,6 +1,6 @@
 class Api::V1::VehiclesController < ApplicationController
 
-  before_action :set_vehicle, only: [:show, :update]
+  before_action :set_vehicle, only: [:show, :update, :destroy]
 
   def index
     @vehicles = Vehicle.where(make_id: params[:make_id], model_id: params[:model_id])
@@ -20,6 +20,15 @@ class Api::V1::VehiclesController < ApplicationController
   def update
     @vehicle.update_attributes(updated_vehicle_params)
     render json: @vehicle, serializer: VehiclesSerializer
+  end
+
+  def destroy
+    @vehicle.update_attributes(deleted_at: Time.now)
+    render json: @vehicle, serializer: VehiclesSerializer
+
+    # For actual DB deletion
+    # @vehicle.destroy
+    # head :no_content
   end
 
   private
