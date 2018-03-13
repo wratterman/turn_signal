@@ -11,9 +11,19 @@ class Api::V1::VehiclesController < ApplicationController
     render json: @vehicle, serializer: VehiclesSerializer
   end
 
+  def create
+    @vehicle = Vehicle.new(vehicle_params)
+    @vehicle.save
+    render json: @vehicle, :status=> :created, serializer: VehiclesSerializer
+  end
+
   private
 
   def set_vehicle
     @vehicle = Vehicle.find(params[:id])
+  end
+
+  def vehicle_params
+    params.permit(:make_id, :model_id)
   end
 end
