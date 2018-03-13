@@ -3,8 +3,10 @@ class Api::V1::VehiclesController < ApplicationController
   before_action :set_vehicle, only: [:show, :update, :destroy]
 
   def index
-    if params[:model_id].nil?
+    if params[:model_id].nil? && params[:make_id].nil?
       @vehicles = Vehicle.all
+    elsif params[:model_id].nil?
+      @vehicles = Vehicle.where(make_id: params[:make_id])
     else
       @vehicles = Vehicle.where(model_id: params[:model_id])
     end
