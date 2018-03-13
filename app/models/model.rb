@@ -1,6 +1,6 @@
-class Make < ApplicationRecord
+class Model < ApplicationRecord
   validates :name, presence: true, uniqueness: true
 
-  has_many :models
+  belongs_to :make
   has_many :vehicles
 end
