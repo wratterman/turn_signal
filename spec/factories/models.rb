@@ -3,5 +3,6 @@ FactoryGirl.define do
     sequence :name do |i|
       "Car Model#{i}"
     end
+    make
   end
 end
