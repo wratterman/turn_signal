@@ -1,5 +1,5 @@
 class ModelsSerializer < ActiveModel::Serializer
-  attributes :id, :name, :make, :num_active_vehicles,
+  attributes :id, :name, :make, :vehicles, :num_active_vehicles,
              :deleted_at, :created_at, :updated_at
 
   def make
@@ -7,6 +7,10 @@ class ModelsSerializer < ActiveModel::Serializer
       make_id: @object.make.id,
       make_name: @object.make.name,
     }
+  end
+
+  def vehicles
+    @object.vehicles
   end
 
   def num_active_vehicles
