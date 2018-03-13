@@ -124,4 +124,34 @@ describe "Vehicles API" do
     expect(raw_vehicle[:created_at]).to_not be_nil
     expect(raw_vehicle[:updated_at]).to_not be_nil
   end
+
+  it "PUT an existing vehicle to database" do
+    # When I send a PUT request to `/api/v1/makes/:make_id/models/:model_id/vehicles/:id?model_id=x`
+    # I receive a successfull response updating a new vehicle associated with
+    # that make and model
+    # And that vehicle has an id, make displaying the id & name,
+    # model displaying the id & name, deleted_at, created_at, and updated_at
+    make1 = create(:make)
+    model1 = create(:model, make: make1)
+    model2 = create(:model, make: make1)
+    vehicle = create(:vehicle, make: make1, model: model1)
+
+    expect(Vehicle.count).to eq(1)
+
+    put "/api/v1/makes/#{make1.id}/models/#{model1.id}/vehicles/#{vehicle.id}?new_model=#{model2.id}"
+
+    expect(response).to be_success
+    expect(Vehicle.count).to eq(1)
+    raw_vehicle = JSON.parse(response.body, symbolize_names: true)
+
+    expect(raw_vehicle[:make][:make_id]).to eq(make1.id)
+    expect(raw_vehicle[:make][:make_name]).to eq(make1.name)
+    expect(raw_vehicle[:model][:model_id]).to eq(model2.id)
+    expect(raw_vehicle[:model][:model_id]).to_not eq(model1.id)
+    expect(raw_vehicle[:model][:model_name]).to eq(model2.name)
+    expect(raw_vehicle[:model][:model_name]).to_not eq(model1.name)
+    expect(raw_vehicle[:deleted_at]).to be_nil
+    expect(raw_vehicle[:created_at]).to_not be_nil
+    expect(raw_vehicle[:updated_at]).to_not eq(vehicle.updated_at) #This shows it was updated
+  end
 end

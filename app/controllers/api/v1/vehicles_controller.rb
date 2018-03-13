@@ -1,6 +1,6 @@
 class Api::V1::VehiclesController < ApplicationController
 
-  before_action :set_vehicle, only: [:show]
+  before_action :set_vehicle, only: [:show, :update]
 
   def index
     @vehicles = Vehicle.where(make_id: params[:make_id], model_id: params[:model_id])
@@ -17,6 +17,11 @@ class Api::V1::VehiclesController < ApplicationController
     render json: @vehicle, :status=> :created, serializer: VehiclesSerializer
   end
 
+  def update
+    @vehicle.update_attributes(updated_vehicle_params)
+    render json: @vehicle, serializer: VehiclesSerializer
+  end
+
   private
 
   def set_vehicle
@@ -25,5 +30,9 @@ class Api::V1::VehiclesController < ApplicationController
 
   def vehicle_params
     params.permit(:make_id, :model_id)
+  end
+
+  def updated_vehicle_params
+    {model_id: params[:new_model]}
   end
 end
