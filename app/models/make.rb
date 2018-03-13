@@ -1,0 +1,3 @@
+class Make < ApplicationRecord
+  validates :name, presence: true, uniqueness: true
+end
