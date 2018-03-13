@@ -42,4 +42,48 @@ describe "Makes API" do
     expect(raw_makes.last[:created_at]).to_not be_nil
     expect(raw_makes.last[:updated_at]).to_not be_nil
   end
+
+  it "gets a specfic item with a 200 response" do
+    make1 = create(:make) # Has no models or vehicles associated
+    make2 = create(:make) # Has 1 model and 1 vehicle associated, used to show accurately
+    model = create(:model, make: make2)
+    vehicle = create(:vehicle, make: model.make, model: model)
+
+    get "/api/v1/makes/#{make1.id}"
+
+    expect(response).to be_success
+    expect(response.status).to eq(200)
+
+    raw_make = JSON.parse(response.body, symbolize_names: true)
+
+    expect(raw_make[:id]).to eq(make1.id)
+    expect(raw_make[:id]).to_not eq(make2.id)
+
+    expect(raw_make[:name]).to eq(make1.name)
+    expect(raw_make[:name]).to_not eq(make2.name)
+
+    expect(raw_make[:models]).to eq([])
+    expect(raw_make[:vehicles]).to eq([])
+    expect(raw_make[:total_active_vehicles]).to eq(0)
+
+    get "/api/v1/makes/#{make2.id}"
+
+    expect(response).to be_success
+    expect(response.status).to eq(200)
+
+    new_raw_make = JSON.parse(response.body, symbolize_names: true)
+
+    expect(new_raw_make[:id]).to eq(make2.id)
+    expect(new_raw_make[:id]).to_not eq(make1.id)
+
+    expect(new_raw_make[:name]).to eq(make2.name)
+    expect(new_raw_make[:name]).to_not eq(make1.name)
+
+    expect(raw_make[:models].first[:model_id]).to eq(model.id)
+    expect(raw_make[:models].first[:name]).to eq(model.name)
+    expect(raw_make[:models].first[:num_active_vehicles]).to eq(1)
+    expect(raw_make[:vehicles].first[:model_id]).to eq(model.id)
+    expect(raw_make[:vehicles].first[:model_name]).to eq(model.name)
+    expect(raw_make[:total_active_vehicles]).to eq(1)
+  end
 end
