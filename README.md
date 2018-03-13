@@ -11,6 +11,16 @@ bundle
 rake db:create db:migrate db:seed
 ```
 
+Run the entire test suite from projecg root with...
+- `rspec spec/`
+
+Or for only unit testing...
+
+- `rspec spec/models`
+
+Or for endpoints...
+
+- `rspec spec/requests`
 ## Database
 
 The database being used in this application is set up so with the following 3 Tables: with Attributes...
