@@ -4,7 +4,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :makes do
         resources :models do
-          resources :vehicles, only: [:index]
+          resources :vehicles, only: [:index, :show]
         end
       end
     end

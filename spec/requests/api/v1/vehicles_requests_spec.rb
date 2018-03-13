@@ -60,4 +60,42 @@ describe "Vehicles API" do
     expect(raw_vehicles.first[:model][:model_id]).to eq(model3.id)
     expect(raw_vehicles.first[:model][:model_name]).to eq(model3.name)
   end
+
+  it "GET a specfic vehicle with JSON 200 response when id is provided" do
+    # When I send a GET request to `/api/v1/makes/:make_id/models/:model_id/vehicles`
+    # I receive a successfull response containing all vehicles associated with
+    # that make and model
+    # And each make has an id, make displaying the id & name,
+    # model displaying the id & name, deleted_at, created_at, and updated_at
+    make1 = create(:make)
+    model1 = create(:model, make: make1)
+    v1    = create(:vehicle, make: make1, model: model1)
+    v2    = create(:vehicle, make: make1, model: model1)
+
+    get "/api/v1/makes/#{make1.id}/models/#{model1.id}/vehicles/#{v1.id}"
+
+    expect(response).to be_success
+
+    raw_vehicle = JSON.parse(response.body, symbolize_names: true)
+
+    expect(raw_vehicle[:id]).to eq(v1.id)
+    expect(raw_vehicle[:id]).to_not eq(v2.id) #Shows it only received per Url ID
+    # Below shows that the serializer worked
+    expect(raw_vehicle[:make][:make_id]).to eq(make1.id)
+    expect(raw_vehicle[:make][:make_name]).to eq(make1.name)
+    expect(raw_vehicle[:model][:model_id]).to eq(model1.id)
+    expect(raw_vehicle[:model][:model_name]).to eq(model1.name)
+    expect(raw_vehicle[:deleted_at]).to be_nil
+    expect(raw_vehicle[:created_at]).to_not be_nil
+    expect(raw_vehicle[:updated_at]).to_not be_nil
+
+    get "/api/v1/makes/#{make1.id}/models/#{model1.id}/vehicles/#{v2.id}"
+
+    expect(response).to be_success
+
+    raw_vehicle = JSON.parse(response.body, symbolize_names: true)
+
+    expect(raw_vehicle[:id]).to eq(v2.id)
+    expect(raw_vehicle[:id]).to_not eq(v1.id) #Shows it only received per Url ID
+  end
 end
