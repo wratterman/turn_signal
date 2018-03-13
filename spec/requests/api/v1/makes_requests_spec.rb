@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe "Makes API" do
-  it "sends a list of makes with JSON 200 respons" do
+  it "sends a list of makes with JSON 200 response" do
     # When I send a GET request to `/api/v1/makes`
     # I receive a successfull response containing all makes
     # And each item has an id, name, associated models, associated vehicles
@@ -79,11 +79,11 @@ describe "Makes API" do
     expect(new_raw_make[:name]).to eq(make2.name)
     expect(new_raw_make[:name]).to_not eq(make1.name)
 
-    expect(raw_make[:models].first[:model_id]).to eq(model.id)
-    expect(raw_make[:models].first[:name]).to eq(model.name)
-    expect(raw_make[:models].first[:num_active_vehicles]).to eq(1)
-    expect(raw_make[:vehicles].first[:model_id]).to eq(model.id)
-    expect(raw_make[:vehicles].first[:model_name]).to eq(model.name)
-    expect(raw_make[:total_active_vehicles]).to eq(1)
+    expect(new_raw_make[:models].first[:model_id]).to eq(model.id)
+    expect(new_raw_make[:models].first[:name]).to eq(model.name)
+    expect(new_raw_make[:models].first[:num_active_vehicles]).to eq(1)
+    expect(new_raw_make[:vehicles].first[:vehicle_id]).to eq(vehicle.id)
+    expect(new_raw_make[:vehicles].first[:model_name]).to eq(vehicle.model.name)
+    expect(new_raw_make[:total_active_vehicles]).to eq(1)
   end
 end
