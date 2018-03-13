@@ -1,6 +1,32 @@
 require 'rails_helper'
 
 describe "Vehicles API" do
+  it "GET all vehicles" do
+    # When I send a GET request to `/api/v1/vehicles`
+    # I receive a successfull response containing all models
+    # And each model has an id, name, and object 'make' containing the make_id and make_name,
+    # associated vehicles, number of total active vehicles, deleted_at, created_at, and updated_at
+    make1 = create(:make)
+    model_1 = create(:model, make: make1)
+    v1 = create(:vehicle, make: make1, model: model_1)
+    make2 = create(:make)
+    model_2 = create(:model, make: make2)
+    v2 = create(:vehicle, make: make2, model: model_2)
+
+    get "/api/v1/vehicles"
+
+    expect(response).to be_success
+
+    vehicles = JSON.parse(response.body, symbolize_names: true)
+    expect(vehicles.length).to eq(2)
+
+    expect(vehicles.first[:make][:make_id]).to_not eq(vehicles.last[:make][:make_id])
+    expect(vehicles.first[:make][:make_name]).to_not eq(vehicles.last[:make][:make_name])
+    expect(vehicles.first[:model][:model_id]).to_not eq(vehicles.last[:model][:model_id])
+    expect(vehicles.first[:model][:model_name]).to_not eq(vehicles.last[:model][:model_name])
+    # This shows that all vehicles are returned, regardless of make
+  end
+
   it "GET a list of vehicles with JSON 200 response" do
     # When I send a GET request to `/api/v1/makes/:make_id/models/:model_id/vehicles`
     # I receive a successfull response containing all vehicles associated with
@@ -59,6 +85,20 @@ describe "Vehicles API" do
     expect(raw_vehicles.first[:make][:make_name]).to eq(make2.name)
     expect(raw_vehicles.first[:model][:model_id]).to eq(model3.id)
     expect(raw_vehicles.first[:model][:model_name]).to eq(model3.name)
+
+    # Should also work with the following url
+    get "/api/v1/models/#{model1.id}/vehicles"
+
+    expect(response).to be_success
+
+    raw_vehicles = JSON.parse(response.body, symbolize_names: true)
+
+    expect(raw_vehicles.length).to eq(2)
+    expect(raw_vehicles.first[:make][:make_id] && raw_vehicles.last[:make][:make_id]).to eq(make1.id)
+    expect(raw_vehicles.first[:make][:make_name] && raw_vehicles.last[:make][:make_name]).to eq(make1.name)
+    expect(raw_vehicles.first[:model][:model_id] && raw_vehicles.last[:model][:model_id]).to eq(model1.id)
+    expect(raw_vehicles.first[:model][:model_name] && raw_vehicles.last[:model][:model_name]).to eq(model1.name)
+    expect(raw_vehicles.first[:id]).to_not eq(raw_vehicles.last[:id])
   end
 
   it "GET a specfic vehicle with JSON 200 response when id is provided" do

@@ -3,7 +3,11 @@ class Api::V1::VehiclesController < ApplicationController
   before_action :set_vehicle, only: [:show, :update, :destroy]
 
   def index
-    @vehicles = Vehicle.where(make_id: params[:make_id], model_id: params[:model_id])
+    if params[:model_id].nil?
+      @vehicles = Vehicle.all
+    else
+      @vehicles = Vehicle.where(model_id: params[:model_id])
+    end
     render json: @vehicles, each_serializer: VehiclesSerializer
   end
 

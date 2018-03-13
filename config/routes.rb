@@ -8,7 +8,10 @@ Rails.application.routes.draw do
         end
       end
 
-      resources :models, only: [:index, :show]
+      resources :models, only: [:index, :show] do
+        resources :vehicles, only: [:index, :show]
+      end
+      resources :vehicles, only: [:index, :show]
     end
   end
 end
