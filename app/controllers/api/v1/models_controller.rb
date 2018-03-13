@@ -1,6 +1,6 @@
 class Api::V1::ModelsController < ApplicationController
 
-  before_action :set_model, only: [:show]
+  before_action :set_model, only: [:show, :update]
 
   def index
     render json: Model.all, each_serializer: ModelsSerializer
@@ -14,6 +14,11 @@ class Api::V1::ModelsController < ApplicationController
     @model = Model.new(model_params)
     @model.save
     render json: @model, :status=> :created, serializer: ModelsSerializer
+  end
+
+  def update
+    @model.update_attributes(model_params)
+    render json: @model, serializer: ModelsSerializer
   end
 
   private

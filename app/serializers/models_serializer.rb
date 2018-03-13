@@ -10,7 +10,13 @@ class ModelsSerializer < ActiveModel::Serializer
   end
 
   def vehicles
-    @object.vehicles
+    @object.vehicles.map do |car|
+      {
+        vehicle_id: car.id,
+        make: car.make.name,
+        model: car.model.name
+      }
+    end
   end
 
   def num_active_vehicles

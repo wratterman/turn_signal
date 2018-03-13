@@ -123,4 +123,36 @@ describe "Models API" do
     expect(new_raw_model[:vehicles]).to eq([])
     expect(new_raw_model[:num_active_vehicles]).to eq(0)
   end
+
+  it "PUT a new model with a 201 response" do
+    # When I send a PUT request to `/api/v1/makes/:make_id/models/:model_id?name=something`
+    # I receive a successfull response containing the specific model which was updated
+    # associated with the specific make is relates to, showing the updated name field
+    # And that model has an id, name that was provide, and object 'make' containing the make_id and make_name,
+    # associated vehicles, number of total active vehicles, deleted_at, created_at, and updated_at
+    make = create(:make) # Has no models or vehicles associated
+    model = create(:model, make: make)
+    vehicle_1 = create(:vehicle, make: make, model: model)
+
+    expect(Model.count).to eq(1)
+    expect(Model.first.name).to_not eq("Wrangler")
+
+    put "/api/v1/makes/#{make.id}/models/#{model.id}?name=Wrangler"
+
+    expect(response).to be_success
+    expect(Model.count).to eq(1) # Shows didn't add nor deleted to Database
+    expect(Model.first.name).to eq("Wrangler") #shows database updated with param values
+
+    raw_model = JSON.parse(response.body, symbolize_names: true)
+    expect(raw_model[:name]).to eq("Wrangler")
+    expect(raw_model[:name]).to eq(Model.last.name)
+    expect(raw_model[:name]).to eq(make.models.last.name)
+    expect(raw_model[:id]).to eq(Model.last.id)
+    expect(raw_model[:make][:make_id]).to eq(Model.last.make.id && make.id)
+    expect(raw_model[:make][:make_name]).to eq(Model.last.make.name && make.name)
+    expect(raw_model[:vehicles].first[:vehicle_id]).to eq(vehicle_1.id)
+    expect(raw_model[:vehicles].first[:make]).to eq(make.name)
+    expect(raw_model[:vehicles].first[:model]).to eq(model.name && "Wrangler")
+    expect(raw_model[:num_active_vehicles]).to eq(1)
+  end
 end
