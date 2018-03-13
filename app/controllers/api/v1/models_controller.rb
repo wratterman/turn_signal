@@ -1,6 +1,6 @@
 class Api::V1::ModelsController < ApplicationController
 
-  before_action :set_model, only: [:show, :update]
+  before_action :set_model, only: [:show, :update, :destroy]
 
   def index
     render json: Model.all, each_serializer: ModelsSerializer
@@ -21,6 +21,18 @@ class Api::V1::ModelsController < ApplicationController
     render json: @model, serializer: ModelsSerializer
   end
 
+  def destroy
+    destroy_dependancies(@model)
+    @model.update_attributes(deleted_at: Time.now)
+    render json: @model, serializer: ModelsSerializer
+
+    # If deleting from the database un-comments from lines 32:33 & 49
+    # and comment out lines 25:27
+
+    # @make.destroy
+    # head :no_content
+  end
+
   private
 
   def set_model
@@ -29,5 +41,12 @@ class Api::V1::ModelsController < ApplicationController
 
   def model_params
     params.permit(:name, :make_id)
+  end
+
+  def destroy_dependancies(model)
+    model.vehicles.each do |vehicle|
+      vehicle.update_attributes(deleted_at: Time.now)
+      #vehicle.destroy
+    end
   end
 end

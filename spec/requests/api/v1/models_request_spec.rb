@@ -155,4 +155,49 @@ describe "Models API" do
     expect(raw_model[:vehicles].first[:model]).to eq(model.name && "Wrangler")
     expect(raw_model[:num_active_vehicles]).to eq(1)
   end
+
+  it "DELETE a specfic model by inserting a Timestamp when the request was made" do
+    # When I send a DELETE request to `/api/v1/makes/:make_id/models/:id`
+    # I receive a successfull response containing showing this specific model
+    # And the make has an id, name that I provided, associated models, associated vehicles
+    # number of total active vehicles, deleted_at NOW INCLUDING TIMESTAMP, created_at, and updated_at
+
+    make = create(:make)
+    model = create(:model, make: make)
+    expect(Make.count).to eq(1)
+    expect(Model.count).to eq(1)
+    expect(make.deleted_at).to be_nil # Nil by default, until deleted.
+    expect(model.deleted_at).to be_nil # Nil by default, until deleted.
+
+    delete "/api/v1/makes/#{make.id}/models/#{model.id}"
+
+    expect(response).to be_success
+
+    raw_model = JSON.parse(response.body, symbolize_names: true)
+
+    expect(raw_model[:id]).to eq(model.id) #Shows that it is the same make
+    expect(raw_model[:deleted_at]).to_not be_nil # Timestamp inserted
+    expect(make.deleted_at).to be_nil #shows that make was not affected by models deletion
+  end
+
+  xit "DELETE a specfic model from database" do
+    # When I send a DELETE request to `/api/v1/makes/:make_id/models/:id`
+    # I receive a successfull response deleting this specific model and dependancies from database
+    # And the page has no content
+
+    make = create(:make)
+    model = create(:model, make: make)
+    vehicle = create(:vehicle, make: make, model: model)
+    expect(Make.count).to eq(1)
+    expect(Model.count).to eq(1)
+    expect(Vehicle.count).to eq(1)
+
+    delete "/api/v1/makes/#{make.id}/models/#{model.id}"
+
+    expect(response).to be_success
+
+    expect(Make.count).to eq(1)
+    expect(Model.count).to eq(0)
+    expect(Vehicle.count).to eq(0) # A successful deleted model deletes vehicles as well but not makes
+  end
 end

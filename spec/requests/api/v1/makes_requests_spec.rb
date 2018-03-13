@@ -159,6 +159,8 @@ describe "Makes API" do
     # number of total active vehicles, deleted_at NOW INCLUDING TIMESTAMP, created_at, and updated_at
 
     make = create(:make)
+    model = create(:model, make: make)
+    create(:vehicle, make: make, model: model)
     expect(Make.count).to eq(1)
     expect(make.deleted_at).to be_nil # Nil by default, until deleted.
 
@@ -170,6 +172,8 @@ describe "Makes API" do
 
     expect(raw_make[:id]).to eq(make.id) #Shows that it is the same make
     expect(raw_make[:deleted_at]).to_not be_nil # Timestamp inserted
+    expect(Model.first.deleted_at).to_not be_nil
+    expect(Vehicle.first.deleted_at).to_not be_nil # These show that dependancies were also updated
   end
 
   # Here is the test if I were going to just delete the make from the database
