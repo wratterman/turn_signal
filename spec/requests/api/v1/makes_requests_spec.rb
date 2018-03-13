@@ -4,7 +4,7 @@ describe "Makes API" do
   it "GET a list of makes with JSON 200 response" do
     # When I send a GET request to `/api/v1/makes`
     # I receive a successfull response containing all makes
-    # And each item has an id, name, associated models, associated vehicles
+    # And each make has an id, name, associated models, associated vehicles
     # number of total active vehicles, deleted_at, created_at, and updated_at
 
     make1 = create(:make) # Has no models or vehicles associated
@@ -44,6 +44,10 @@ describe "Makes API" do
   end
 
   it "GET a specfic make with a 200 response" do
+    # When I send a GET request to `/api/v1/makes/:id`
+    # I receive a successfull response containing the specific make who's id was provided
+    # And the make has an id, name, associated models, associated vehicles
+    # number of total active vehicles, deleted_at, created_at, and updated_at
     make1 = create(:make) # Has no models or vehicles associated
     make2 = create(:make) # Has 1 model and 1 vehicle associated, used to show accurately
     model = create(:model, make: make2)
@@ -88,6 +92,11 @@ describe "Makes API" do
   end
 
   it "POST a new make with a 201 response" do
+    # When I send a POST request to `/api/v1/makes?name=something`
+    # I receive a successfull response containing the specific make which was created
+    # And the make has an id, name that I provided, associated models, associated vehicles
+    # number of total active vehicles, deleted_at, created_at, and updated_at
+
     expect(Make.count).to eq(0)
 
     post "/api/v1/makes?name=SmartCar"
@@ -112,6 +121,11 @@ describe "Makes API" do
   end
 
   it "PUT an existing make" do
+    # When I send a PUT request to `/api/v1/makes/:id?name=something`
+    # I receive a successfull response containing the specific make which I updated
+    # And the make has an id, name that I changed, associated models, associated vehicles
+    # number of total active vehicles, deleted_at, created_at, and new updated_at
+
     make1 = create(:make) # Has no models or vehicles associated
     old_updated_at = make1.updated_at
 
@@ -137,4 +151,38 @@ describe "Makes API" do
     expect(make[:name]).to eq("Audi")
     expect(make[:id]).to eq(make1.id)
   end
+
+  it "DELETE a specfic make by inserting a Timestamp when the request was made" do
+    # When I send a DELETE request to `/api/v1/makes/:ID`
+    # I receive a successfull response containing the specific make which was created
+    # And the make has an id, name that I provided, associated models, associated vehicles
+    # number of total active vehicles, deleted_at NOW INCLUDING TIMESTAMP, created_at, and updated_at
+
+    make = create(:make)
+    expect(Make.count).to eq(1)
+    expect(make.deleted_at).to be_nil # Nil by default, until deleted.
+
+    delete "/api/v1/makes/#{make_id}"
+
+    expect(response).to be_success
+
+    raw_make = JSON.parse(response.body, symbolize_names: true)
+
+    expect(raw_make[:id]).to eq(make.id) #Shows that it is the same make
+    expect(raw_make[:deleted_at]).to_not be_nil # Timestamp inserted
+  end
+
+  # Here is the test if I were going to just delete the make from the database
+
+  # it "DELETE a specfic make with a 204 response" do
+  #   #When I send a DELETE request to `/api/v1/makes/:id`
+  #   #I receive a successfull 204 response containing the specific make which was created
+  #   #And the make is deleted form the database
+  #
+  #   delete "/api/v1/makes/#{make_id}"
+  #
+  #   expect(response).to be_success
+  #   expect(response.status).to eq(204)
+  #   expect(Item.count).to eq(0)
+  # end
 end
