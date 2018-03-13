@@ -6,6 +6,7 @@ Rails.application.routes.draw do
       get "/makes/:id", to: 'makes#show'
       post "/makes", to: 'makes#create'
       put "/makes/:id", to: 'makes#update'
+      delete "/makes/:id", to: 'makes#destroy'
     end
   end
 end

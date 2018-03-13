@@ -162,7 +162,7 @@ describe "Makes API" do
     expect(Make.count).to eq(1)
     expect(make.deleted_at).to be_nil # Nil by default, until deleted.
 
-    delete "/api/v1/makes/#{make_id}"
+    delete "/api/v1/makes/#{make.id}"
 
     expect(response).to be_success
 
@@ -173,16 +173,27 @@ describe "Makes API" do
   end
 
   # Here is the test if I were going to just delete the make from the database
+  # To run, comment out lines 25-26 in MakesController, uncomment lines 31-32 & 46-53
+  # and skip the test above & unskip the text below
 
-  # it "DELETE a specfic make with a 204 response" do
-  #   #When I send a DELETE request to `/api/v1/makes/:id`
-  #   #I receive a successfull 204 response containing the specific make which was created
-  #   #And the make is deleted form the database
-  #
-  #   delete "/api/v1/makes/#{make_id}"
-  #
-  #   expect(response).to be_success
-  #   expect(response.status).to eq(204)
-  #   expect(Item.count).to eq(0)
-  # end
+  xit "DELETE a specfic make with a 204 response" do
+    #When I send a DELETE request to `/api/v1/makes/:id`
+    #I receive a successfull 204 response containing the specific make which was created
+    #And the make is deleted form the database
+
+    make = create(:make)
+    model = create(:model, make: make)
+    create(:vehicle, make: make, model: model)
+    expect(Make.count).to eq(1)
+    expect(Model.count).to eq(1)
+    expect(Vehicle.count).to eq(1)
+
+    delete "/api/v1/makes/#{make.id}"
+
+    expect(response).to be_success
+    expect(response.status).to eq(204)
+    expect(Make.count).to eq(0)
+    expect(Model.count).to eq(0)   # Destroys depandancies as well
+    expect(Vehicle.count).to eq(0)
+  end
 end
