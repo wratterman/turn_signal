@@ -1,13 +1,35 @@
 require 'rails_helper'
 
 describe "Models API" do
-  it "GET a list of models with JSON 200 response" do
-    # When I send a GET request to `/api/v1/makes/:make_id/models`
+
+  it "GET all models" do
+    # When I send a GET request to `/api/v1/models`
     # I receive a successfull response containing all models
     # And each model has an id, name, and object 'make' containing the make_id and make_name,
     # associated vehicles, number of total active vehicles, deleted_at, created_at, and updated_at
+    make1 = create(:make)
+    model_1 = create(:model, make: make1)
+    make2 = create(:make)
+    model_2 = create(:model, make: make2)
 
-    make = create(:make) # Has no models or vehicles associated
+    get "/api/v1/models"
+
+    expect(response).to be_success
+
+    models = JSON.parse(response.body, symbolize_names: true)
+    expect(models.length).to eq(2)
+
+    expect(models.first[:make][:make_id]).to_not eq(models.last[:make][:make_id])
+    # This shows that all models are returned, regardless of make
+  end
+
+  it "GET a list of models with JSON 200 response nested in make" do
+    # When I send a GET request to `/api/v1/makes/:make_id/models`
+    # I receive a successfull response containing all models associated with the make_id
+    # And each model has an id, name, and object 'make' containing the make_id and make_name,
+    # associated vehicles, number of total active vehicles, deleted_at, created_at, and updated_at
+
+    make = create(:make)
     model_1 = create(:model, make: make)
     model_2 = create(:model, make: make)
     vehicle_1 = create(:vehicle, make: make, model: model_1)
@@ -42,7 +64,7 @@ describe "Models API" do
     # And that model has an id, name, and object 'make' containing the make_id and make_name,
     # associated vehicles, number of total active vehicles, deleted_at, created_at, and updated_at
 
-    make = create(:make) # Has no models or vehicles associated
+    make = create(:make)
     model_1 = create(:model, make: make)
     model_2 = create(:model, make: make)
     vehicle_1 = create(:vehicle, make: make, model: model_1)
@@ -64,6 +86,35 @@ describe "Models API" do
     expect(raw_model[:updated_at]).to_not be_nil
 
     get "/api/v1/makes/#{make.id}/models/#{model_2.id}"
+    expect(response).to be_success
+
+    new_raw_model = JSON.parse(response.body, symbolize_names: true)
+
+    expect(new_raw_model[:id]).to eq(model_2.id)
+    expect(new_raw_model[:name]).to eq(model_2.name)
+    expect(new_raw_model[:make][:make_id]).to eq(model_2.make.id && make.id)
+    expect(new_raw_model[:make][:make_name]).to eq(model_2.make.name && make.name)
+    expect(new_raw_model[:num_active_vehicles]).to eq(model_2.vehicles.count && 1)
+    expect(new_raw_model[:deleted_at]).to be_nil
+    expect(new_raw_model[:created_at]).to_not be_nil
+    expect(new_raw_model[:updated_at]).to_not be_nil
+
+    #Should work with the following urls as well
+    get "/api/v1/models/#{model_1.id}"
+    expect(response).to be_success
+
+    raw_model = JSON.parse(response.body, symbolize_names: true)
+
+    expect(raw_model[:id]).to eq(model_1.id)
+    expect(raw_model[:name]).to eq(model_1.name)
+    expect(raw_model[:make][:make_id]).to eq(model_1.make.id && make.id)
+    expect(raw_model[:make][:make_name]).to eq(model_1.make.name && make.name)
+    expect(raw_model[:num_active_vehicles]).to eq(model_1.vehicles.count && 2)
+    expect(raw_model[:deleted_at]).to be_nil
+    expect(raw_model[:created_at]).to_not be_nil
+    expect(raw_model[:updated_at]).to_not be_nil
+
+    get "/api/v1/models/#{model_2.id}"
     expect(response).to be_success
 
     new_raw_model = JSON.parse(response.body, symbolize_names: true)
@@ -130,7 +181,7 @@ describe "Models API" do
     # associated with the specific make is relates to, showing the updated name field
     # And that model has an id, name that was provide, and object 'make' containing the make_id and make_name,
     # associated vehicles, number of total active vehicles, deleted_at, created_at, and updated_at
-    make = create(:make) # Has no models or vehicles associated
+    make = create(:make)
     model = create(:model, make: make)
     vehicle_1 = create(:vehicle, make: make, model: model)
 

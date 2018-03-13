@@ -3,7 +3,11 @@ class Api::V1::ModelsController < ApplicationController
   before_action :set_model, only: [:show, :update, :destroy]
 
   def index
-    @models = Make.find(params[:make_id]).models
+    if params[:make_id].nil?
+      @models = Model.all
+    else
+      @models = Make.find(params[:make_id]).models
+    end
     render json: @models, each_serializer: ModelsSerializer
   end
 

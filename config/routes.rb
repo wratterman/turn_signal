@@ -7,6 +7,8 @@ Rails.application.routes.draw do
           resources :vehicles
         end
       end
+
+      resources :models, only: [:index, :show]
     end
   end
 end
