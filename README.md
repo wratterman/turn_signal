@@ -2,6 +2,8 @@
 
 ## Installing / Getting started
 
+**You can reach these endpoints using the base URL** ``https://serene-taiga-80716.herokuapp.com/`` **followed by the endpoints listed below**
+
 To setup on project/database on your local drive...
 
 ```shell
