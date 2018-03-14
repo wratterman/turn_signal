@@ -2,7 +2,8 @@
 
 ## Installing / Getting started
 
-**You can reach these endpoints using the base URL** [https://serene-taiga-80716.herokuapp.com/](https://serene-taiga-80716.herokuapp.com/) **followed by the endpoints listed below**
+**You can reach these endpoints using the base URL** [https://serene-taiga-80716.herokuapp.com/](https://serene-taiga-80716.herokuapp.com/) **followed by the endpoints listed below** 
+- Root page runs GET `/makes` by default
 
 To setup on project/database on your local drive...
 
@@ -13,7 +14,7 @@ bundle
 rake db:create db:migrate db:seed
 ```
 
-Run the entire test suite from projecg root with...
+Run the entire test suite from project root with...
 - `rspec spec/`
 
 Or for only unit testing...
