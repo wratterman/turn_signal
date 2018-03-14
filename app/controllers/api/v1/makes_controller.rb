@@ -26,8 +26,8 @@ class Api::V1::MakesController < ApplicationController
     @make.update_attributes(deleted_at: Time.now)
     render json: @make, serializer: MakesSerializer
 
-    # If deleting from the database un-comments from lines 31:32 & 49 & 53
-    # and comment out lines 25:27
+    # If deleting from the database un-comments from lines 32:33 & 49 & 53
+    # and comment out lines 26:27
 
     # @make.destroy
     # head :no_content
