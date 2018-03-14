@@ -77,8 +77,8 @@ First, run `rails s`.
 
 - `/api/v1/makes/:make_id/models/:id/vehicles/:id` Individual vehicles with :id and attributes :make_id & :model_id.
     - **GET** : Returns the individual vehicle found by it's :id
-    - **PUT** : Updates an existing vehicle; Require param `model` as integer for updated model_id. Upon completion, you will be redirected to the endpoint for that updated vehicle.
-      - params can either be passed through the url, ie `.../api/v1/makes/:make_id/models/:model_id/vehicles/:id?model=x` or through the body using the format `{'model': 2}`.
+    - **PUT** : Updates an existing vehicle; Require param `new_model` as integer for updated model_id. Upon completion, you will be redirected to the endpoint for that updated vehicle.
+      - params can either be passed through the url, ie `.../api/v1/makes/:make_id/models/:model_id/vehicles/:id?new_model=x` or through the body using the format `{'new_model': 2}`.
     - **DELETE** : Updates the `deleted_at` attribute for the vehicles found by :id. The deleted_at attribute updates from `nil` to a Timestamp from when the action was requested. 
 
 - `/api/v1/models` collection of all models.
