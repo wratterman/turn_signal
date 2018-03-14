@@ -31,8 +31,8 @@ class Api::V1::ModelsController < ApplicationController
     @model.update_attributes(deleted_at: Time.now)
     render json: @model, serializer: ModelsSerializer
 
-    # If deleting from the database un-comments from lines 32:33 & 49
-    # and comment out lines 25:27
+    # If deleting from the database un-comments from lines 37:38 & 54
+    # and comment out lines 31:32
 
     # @make.destroy
     # head :no_content
